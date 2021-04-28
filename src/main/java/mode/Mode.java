@@ -2,9 +2,11 @@ package mode;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.IntSummaryStatistics;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.sort;
@@ -40,13 +42,12 @@ public class Mode {
 //        }
 //        return popular;
 
-        Supplier<Stream<Integer>> istr = () -> Arrays.stream(numbers).boxed();
-        Integer max = istr.get().max(Comparator.comparing(Integer::valueOf)).get();
-        Integer min = istr.get().min(Comparator.comparing(Integer::valueOf)).get();
-        if (min < 0 || max > 100) {
+        Supplier<IntStream> istr = () -> Arrays.stream(numbers);
+        IntSummaryStatistics istat = istr.get().summaryStatistics();
+        if (istat.getMin() < 0 || istat.getMax() > 100) {
             throw new IllegalArgumentException("Invalid number");
         }
-        Map<Integer,Integer> stat = istr.get().collect(Collectors.toMap(Integer::intValue, v -> 1, Integer::sum));
+        Map<Integer,Integer> stat = istr.get().mapToObj(i -> (Integer)i).collect(Collectors.toMap(Integer::intValue, v -> 1, Integer::sum));
         int num = 0;
         int maxnum = 0;
         for (Integer item : stat.keySet()){
